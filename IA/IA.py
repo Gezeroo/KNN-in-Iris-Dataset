@@ -167,79 +167,50 @@ sucessos = count_success(pontos_treinamento, pontos_teste, k)
 print("taxa de sucesso:", 100 * sucessos / 30, "%")
 
 
-# for i in pontos_treinamento:
-#     distancias(pontos_treinamento, i)
-    # print(i.id,' ',i.x,' ',i.y,' ',i.type)
+"""
 
-# sucesso_por_k = {}
+    OUUUUUU
 
-# for k in k_n:#dicionario para guardar os sucessos para cada k, em cada ponto de treinamento
-#     sucesso_por_k[k] = 0
+"""
 
+# sucessos_por_k = defaultdict(int)
 # for i in pontos_treinamento:#analise desses sucessos....
-#     Indice_setosa = 0
-#     Indice_virginica = 0
-#     Indice_versicolor = 0
+#     indices = {
+#         "Iris-setosa": 0,
+#         "Iris-virginica": 0,
+#         "Iris-versicolor": 0,
+#     }
 
 #     for k in k_n:
-        
 #         for j in range(k):
-#             if i.dists[j][0].type == 'Iris-setosa':
-#                 Indice_setosa += 1
-#             elif i.dists[j][0].type == 'Iris-virginica':
-#                 Indice_virginica += 1
-#             elif i.dists[j][0].type == 'Iris-versicolor':
-#                 Indice_versicolor += 1
-#         if max(Indice_setosa,Indice_versicolor,Indice_virginica) == Indice_setosa:
-#             if i.type == 'Iris-setosa':
-#                 sucesso_por_k[k]+=1
-#         elif max(Indice_setosa,Indice_versicolor,Indice_virginica) == Indice_versicolor:
-#             if i.type == 'Iris-versicolor':
-#                 sucesso_por_k[k]+=1
-#         elif max(Indice_setosa,Indice_versicolor,Indice_virginica) == Indice_virginica:
-#             if i.type == 'Iris-virginica':
-#                 sucesso_por_k[k]+=1
+#             indices[i.dists[j][0].type] += 1
+
+#         if i.type == max(indices, key=indices.get):
+#             sucessos_por_k[k] += 1
 
 # for k in sucessos_por_k.keys():
-#     print(
-#         f"Para k = {k}, {sucessos_por_k[k]} sucessos. (Taxa: {100 * sucessos_por_k[k] / 120}%)"
-#     )
+#     print(f"Para k = {k}, {sucessos_por_k[k]} sucessos. (Taxa: {100 * sucessos_por_k[k] / 120}%)")
 
-# k = max(sucesso_por_k, key=sucesso_por_k.get)#pega o menor k com a maior taxa de sucesso (k otimo)
+# k = max(sucessos_por_k, key=sucessos_por_k.get)#pega o menor k com a maior taxa de sucesso (k otimo)
 # print('k otimo:',k)
 
-# # gera os pontos de teste com base no dataframe e guarda as distancias relativas de todos os pontos de TREINAMENTO com cada um desses pontos
-# pontos_teste = generate_pontos(
-#     teste["Id"].to_list(),
-#     teste["PetalWidthCm"].to_list(),
-#     teste["PetalLengthCm"].to_list(),
-#     teste["Species"].to_list(),
-# )
-
+# # # gera os pontos de teste com base no dataframe e guarda as distancias relativas de todos os pontos de TREINAMENTO com cada um desses pontos
 # for i in pontos_teste:
 #     distancias(pontos_treinamento, i)
 
 # sucessos = 0
 
 # for i in pontos_teste:  # analise da taxa de sucesso do k escolhido com os pontos de teste
-#     Indice_setosa = 0
-#     Indice_virginica = 0
-#     Indice_versicolor = 0
+#     indices = {
+#         "Iris-setosa": 0,
+#         "Iris-virginica": 0,
+#         "Iris-versicolor": 0,
+#     }
+
 #     for j in range(k):
-#         if i.dists[j][0].type == "Iris-setosa":
-#             Indice_setosa += 1
-#         elif i.dists[j][0].type == "Iris-virginica":
-#             Indice_virginica += 1
-#         elif i.dists[j][0].type == "Iris-versicolor":
-#             Indice_versicolor += 1
-#     if max(Indice_setosa, Indice_versicolor, Indice_virginica) == Indice_setosa:
-#         if i.type == "Iris-setosa":
-#             sucessos += 1
-#     elif max(Indice_setosa, Indice_versicolor, Indice_virginica) == Indice_versicolor:
-#         if i.type == "Iris-versicolor":
-#             sucessos += 1
-#     elif max(Indice_setosa, Indice_versicolor, Indice_virginica) == Indice_virginica:
-#         if i.type == "Iris-virginica":
-#             sucessos += 1
+#         indices[i.dists[j][0].type] += 1
+    
+#     if i.type == max(indices, key=indices.get):
+#         sucessos += 1
 
 # print("taxa de sucesso:", 100 * sucessos / 30, "%")
