@@ -58,50 +58,48 @@ versicolor = iris.loc[iris["Species"] == "Iris-versicolor"]
 # print(virginica)
 # print(versicolor)
 
-# boxplots de cada especie
-fig, (axs1, axs2) = plt.subplots(2, 2)
-fig.suptitle("boxplots para cada característica")
-axs1[0].boxplot(
-    [setosa["PetalWidthCm"], virginica["PetalWidthCm"], versicolor["PetalWidthCm"]],
-    labels=["setosa", "virginica", "versicolor"],
-)
-axs1[0].set_title("Petal Width")
+# Boxplots e Scatter Plot em um único gráfico
+# fig, axs = plt.subplots(2, 3, figsize=(18, 10))
+# fig.suptitle("Boxplots e Scatter Plot para cada característica")
 
-axs1[1].boxplot(
-    [setosa["PetalLengthCm"], virginica["PetalLengthCm"], versicolor["PetalLengthCm"]],
-    labels=["setosa", "virginica", "versicolor"],
-)
-axs1[1].set_title("Petal Length")
+# # Boxplots
+# axs[0, 0].boxplot(
+#     [setosa["PetalWidthCm"], virginica["PetalWidthCm"], versicolor["PetalWidthCm"]],
+#     labels=["setosa", "virginica", "versicolor"],
+# )
+# axs[0, 0].set_title("Petal Width")
 
-axs2[0].boxplot(
-    [setosa["SepalWidthCm"], virginica["SepalWidthCm"], versicolor["SepalWidthCm"]],
-    labels=["setosa", "virginica", "versicolor"],
-)
-axs2[0].set_title("Sepal Width")
+# axs[0, 1].boxplot(
+#     [setosa["PetalLengthCm"], virginica["PetalLengthCm"], versicolor["PetalLengthCm"]],
+#     labels=["setosa", "virginica", "versicolor"],
+# )
+# axs[0, 1].set_title("Petal Length")
 
-axs2[1].boxplot(
-    [setosa["SepalLengthCm"], virginica["SepalLengthCm"], versicolor["SepalLengthCm"]],
-    labels=["setosa", "virginica", "versicolor"],
-)
-axs2[1].set_title("Sepal Length")
+# axs[1, 1].boxplot(
+#     [setosa["SepalWidthCm"], virginica["SepalWidthCm"], versicolor["SepalWidthCm"]],
+#     labels=["setosa", "virginica", "versicolor"],
+# )
+# axs[1, 1].set_title("Sepal Width")
 
-# plt.show()
+# axs[1, 0].boxplot(
+#     [setosa["SepalLengthCm"], virginica["SepalLengthCm"], versicolor["SepalLengthCm"]],
+#     labels=["setosa", "virginica", "versicolor"],
+# )
+# axs[1, 0].set_title("Sepal Length")
 
-# grafico de pontos de cada especie (escolhemos petal width e length como base para agrupamento)
-plt.scatter(setosa["PetalWidthCm"], setosa["PetalLengthCm"], c="green", label="Setosa")
-plt.scatter(
-    virginica["PetalWidthCm"], virginica["PetalLengthCm"], c="red", label="Virginica"
-)
-plt.scatter(
-    versicolor["PetalWidthCm"],
-    versicolor["PetalLengthCm"],
-    c="blue",
-    label="Versicolor",
-)
-plt.xlabel("PetalWidthCm")
-plt.ylabel("PetalLengthCm")
-plt.legend()
+# # Scatter plot
+# axs[0, 2].scatter(setosa["PetalWidthCm"], setosa["PetalLengthCm"], c="green", label="Setosa")
+# axs[0, 2].scatter(virginica["PetalWidthCm"], virginica["PetalLengthCm"], c="red", label="Virginica")
+# axs[0, 2].scatter(versicolor["PetalWidthCm"], versicolor["PetalLengthCm"], c="blue", label="Versicolor")
+# axs[0, 2].set_xlabel("PetalWidthCm")
+# axs[0, 2].set_ylabel("PetalLengthCm")
+# axs[0, 2].legend()
+# axs[0, 2].set_title("Scatter Plot of Petal Width vs Petal Length")
 
+# # Remove the empty subplot
+# fig.delaxes(axs[1, 2])
+
+# plt.tight_layout(rect=[0, 0, 1, 0.96])
 # plt.show()
 
 # gera os pontos de treinamento com base no dataframe e guarda as distancias relativas de todos os pontos de treinamento com cada um desses pontos
@@ -121,96 +119,60 @@ pontos_teste = generate_pontos(
 )
 
 # função que conta os sucessos de cada k ou de um k especifico (testando)
-k_n = [i for i in range(1, len(pontos_treinamento)) if i % 3 != 0]  # dá pra mudar os valores aqui se precisa
+# k_n = [i for i in range(1, len(pontos_treinamento)) if i % 3 != 0]  # dá pra mudar os valores aqui se precisa
+k_n = [i for i in range(1, len(pontos_treinamento)) if i % 2 == 1]  # dá pra mudar os valores aqui se precisa
 
-def count_success(pontos_treinamento, pontos_teste, testando=None):
-    def success(k, i):
+for i in pontos_treinamento:  # gera as distancias de cada ponto de treinamento com todos os outros pontos de treinamento
+    distancias(pontos_treinamento, i)
+
+sucessos_por_k = {i: 0 for i in k_n}
+for i in pontos_treinamento:  # analise desses sucessos....
+    indices = {
+        "Iris-setosa": 0,
+        "Iris-virginica": 0,
+        "Iris-versicolor": 0,
+    }
+    for k in k_n:
         for j in range(k):
-            quantidades[i.dists[j][0].type] += 1
+            indices[i.dists[j][0].type] += 1
 
-        return i.type == max(quantidades, key=quantidades.get)
+        if i.type == max(indices, key=indices.get):
+            sucessos_por_k[k] += 1
 
-    for i in pontos_teste:
-        distancias(pontos_treinamento, i)
-
-    sucessos = 0
-    if not testando:
-        sucessos = defaultdict(int)
-
-    for i in pontos_teste:
-        quantidades = {
-            "Iris-setosa": 0,
-            "Iris-virginica": 0,
-            "Iris-versicolor": 0,
-        }
-
-        if not testando:
-            for k in k_n:
-                if success(k, i):
-                    sucessos[k] += 1
-        elif success(testando, i):
-            sucessos += 1
-
-    return sucessos
-
-
-sucessos_por_k = count_success(pontos_treinamento, pontos_treinamento)
 for k in sucessos_por_k.keys():
     print(f"Para k = {k}, {sucessos_por_k[k]} sucessos. (Taxa: {100 * sucessos_por_k[k] / 120}%)")
 
-
-k = max(sucessos_por_k, key=sucessos_por_k.get)
+k = max(sucessos_por_k, key=sucessos_por_k.get)  # pega o menor k com a maior taxa de sucesso (k otimo)
 print("k otimo:", k)
 
+plt.figure(figsize=(10, 6))
+plt.plot(sucessos_por_k.keys(), [100 * sucessos_por_k[k] / len(pontos_treinamento) for k in sucessos_por_k.keys()])
+# plt.yticks(range(0, 101, 10))
+plt.xlabel('k')
+plt.ylabel('Success Rate (%)')
+plt.title('Success Rate vs k')
+plt.grid(True)
+# Highlight the chosen k on the plot
+plt.axvline(x=k, color='r', linestyle='--', label=f'k ótimo: {k}')
+plt.legend()
+plt.show()
+# # gera os pontos de teste com base no dataframe e guarda as distancias relativas de todos os pontos de TREINAMENTO com cada um desses pontos
 
-sucessos = count_success(pontos_treinamento, pontos_teste, k)
+for i in pontos_teste:  # gera as distancias de cada ponto de teste com todos os pontos de treinamento
+    distancias(pontos_treinamento, i)
+
+sucessos = 0
+for i in pontos_teste:  # analise da taxa de sucesso do k escolhido com os pontos de teste
+    indices = {
+        "Iris-setosa": 0,
+        "Iris-virginica": 0,
+        "Iris-versicolor": 0,
+    }
+
+    for j in range(k):
+        indices[i.dists[j][0].type] += 1
+
+    if i.type == max(indices, key=indices.get):
+        sucessos += 1
+
 print("taxa de sucesso:", 100 * sucessos / 30, "%")
-
-
-"""
-
-    OUUUUUU
-
-"""
-
-# sucessos_por_k = defaultdict(int)
-# for i in pontos_treinamento:#analise desses sucessos....
-#     indices = {
-#         "Iris-setosa": 0,
-#         "Iris-virginica": 0,
-#         "Iris-versicolor": 0,
-#     }
-
-#     for k in k_n:
-#         for j in range(k):
-#             indices[i.dists[j][0].type] += 1
-
-#         if i.type == max(indices, key=indices.get):
-#             sucessos_por_k[k] += 1
-
-# for k in sucessos_por_k.keys():
-#     print(f"Para k = {k}, {sucessos_por_k[k]} sucessos. (Taxa: {100 * sucessos_por_k[k] / 120}%)")
-
-# k = max(sucessos_por_k, key=sucessos_por_k.get)#pega o menor k com a maior taxa de sucesso (k otimo)
-# print('k otimo:',k)
-
-# # # gera os pontos de teste com base no dataframe e guarda as distancias relativas de todos os pontos de TREINAMENTO com cada um desses pontos
-# for i in pontos_teste:
-#     distancias(pontos_treinamento, i)
-
-# sucessos = 0
-
-# for i in pontos_teste:  # analise da taxa de sucesso do k escolhido com os pontos de teste
-#     indices = {
-#         "Iris-setosa": 0,
-#         "Iris-virginica": 0,
-#         "Iris-versicolor": 0,
-#     }
-
-#     for j in range(k):
-#         indices[i.dists[j][0].type] += 1
-    
-#     if i.type == max(indices, key=indices.get):
-#         sucessos += 1
-
-# print("taxa de sucesso:", 100 * sucessos / 30, "%")
