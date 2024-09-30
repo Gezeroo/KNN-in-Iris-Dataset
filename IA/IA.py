@@ -8,11 +8,11 @@ from collections import defaultdict
 class pontoIris:  # classe de cada ponto de análise (válido para treinamento e teste)
     dists = []
 
-    def __init__(self, x, y, type, id):
+    def __init__(self, x, y, species, id):
         self.id = id
         self.x = x
         self.y = y
-        self.type = type
+        self.species = species
 
 
 def generate_pontos(ids, xs, ys, species):
@@ -150,9 +150,9 @@ for i in pontos_treinamento:  # analise desses sucessos....
     }
     for k in k_n:
         for j in range(k):
-            indices[i.dists[j][0].type] += 1
+            indices[i.dists[j][0].species] += 1
 
-        if i.type == max(indices, key=indices.get):
+        if i.species == max(indices, key=indices.get):
             sucessos_por_k[k] += 1
 
 for k in sucessos_por_k.keys():
@@ -184,9 +184,9 @@ for i in pontos_teste:  # analise da taxa de sucesso do k escolhido com os ponto
     }
 
     for j in range(k):
-        indices[i.dists[j][0].type] += 1
+        indices[i.dists[j][0].species] += 1
 
-    if i.type == max(indices, key=indices.get):
+    if i.species == max(indices, key=indices.get):
         sucessos += 1
 
 print("taxa de sucesso:", 100 * sucessos / 30, "%")
