@@ -38,21 +38,37 @@ def distancias(pontos_treinamento, ponto):
     ponto.dists = dists[1:]
 
 
-iris = pd.read_csv("./Iris.csv")  # le o database
+# Lê o database
+iris = pd.read_csv("./Iris.csv")
 
-iris = iris.sample(frac=1)  # embaralha o database
+# Seleciona as colunas de características
+features = ["PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]
 
-# separa o database em campo de teste e treinamento
-treinamento = iris[: round(len(iris) * 0.8)]
-teste = iris[round(len(iris) * 0.8) :]
+# Embaralha o database
+iris = iris.sample(frac=1)  # random_state para reprodutibilidade
+
+# Separa o database em conjunto de treinamento e teste
+tam_treinamento = round(len(iris) * 0.8)
+treinamento = iris[:tam_treinamento]
+teste = iris[tam_treinamento:]
+
+# Calcula a média e o desvio padrão com base apenas no conjunto de treinamento
+media_treinamento = treinamento[features].mean()
+std_treinamento = treinamento[features].std()
+
+# Normaliza o conjunto de treinamento usando .loc
+treinamento.loc[:, features] = (treinamento.loc[:, features] - media_treinamento) / std_treinamento
+
+# Normaliza o conjunto de teste utilizando a média e o desvio padrão do conjunto de treinamento usando .loc
+teste.loc[:, features] = (teste.loc[:, features] - media_treinamento) / std_treinamento
 
 # print(treinamento.shape)
 # print(teste.shape)
 
 # separa as linhas do database que sao de cada especie (fins de analise grafica)
-setosa = iris.loc[iris["Species"] == "Iris-setosa"]
-virginica = iris.loc[iris["Species"] == "Iris-virginica"]
-versicolor = iris.loc[iris["Species"] == "Iris-versicolor"]
+# setosa = iris.loc[iris["Species"] == "Iris-setosa"]
+# virginica = iris.loc[iris["Species"] == "Iris-virginica"]
+# versicolor = iris.loc[iris["Species"] == "Iris-versicolor"]
 
 # print(setosa)
 # print(virginica)
@@ -119,8 +135,8 @@ pontos_teste = generate_pontos(
 )
 
 # função que conta os sucessos de cada k ou de um k especifico (testando)
-# k_n = [i for i in range(1, len(pontos_treinamento)) if i % 3 != 0]  # dá pra mudar os valores aqui se precisa
-k_n = [i for i in range(1, len(pontos_treinamento)) if i % 2 == 1]  # dá pra mudar os valores aqui se precisa
+# k_n = [i for i in range(1, len(pontos_treinamento)) if i % 3 != 0]  # dá pra mudar os valores aqui se precisar
+k_n = [i for i in range(1, len(pontos_treinamento)) if i % 2 != 0]  # dá pra mudar os valores aqui se precisar
 
 for i in pontos_treinamento:  # gera as distancias de cada ponto de treinamento com todos os outros pontos de treinamento
     distancias(pontos_treinamento, i)
@@ -147,13 +163,11 @@ print("k otimo:", k)
 
 plt.figure(figsize=(10, 6))
 plt.plot(sucessos_por_k.keys(), [100 * sucessos_por_k[k] / len(pontos_treinamento) for k in sucessos_por_k.keys()])
-# plt.yticks(range(0, 101, 10))
 plt.xlabel('k')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate vs k')
 plt.grid(True)
-# Highlight the chosen k on the plot
-plt.axvline(x=k, color='r', linestyle='--', label=f'k ótimo: {k}')
+plt.axvline(x=k, color='r', linestyle='--', label=f'k ótimo: {k} (taxa: {100 * sucessos_por_k[k] / len(pontos_treinamento)}%)')
 plt.legend()
 plt.show()
 # # gera os pontos de teste com base no dataframe e guarda as distancias relativas de todos os pontos de TREINAMENTO com cada um desses pontos
