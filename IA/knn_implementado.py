@@ -73,9 +73,6 @@ desvio_padrao_treinamento = treinamento[caracteristicas].std()
 treinamento[caracteristicas] = (treinamento[caracteristicas] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de treino
 teste[caracteristicas] = (teste[caracteristicas] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de teste
 
-# Cria um dataframe somente com as colunas PetalWidthCm e PetalLengthCm do conjunto de treinamento
-df_treinamento_petal = treinamento[["Id", "PetalWidthCm", "PetalLengthCm"]].copy()
-df_treinamento_petal.to_csv("df_treinamento_petal.csv", index=False)
 # gera os pontos de treinamento com base no dataframe e guarda as distancias relativas de todos os pontos de treinamento com cada um desses pontos
 pontos_treinamento = gerar_conjunto_pontos(
     treinamento["Id"].to_list(),
@@ -98,22 +95,20 @@ precisao_por_k = {i: 0 for i in valores_k}
 for k in valores_k:
     acertos = 0
 
-    for ponto_treinamento in pontos_treinamento:
-        distancias_ponto_a_todos_pontos_treinamento(pontos_treinamento, ponto_treinamento)
-        vizinhos_mais_proximos = ponto_treinamento.distancias_para_pontos_treinamento[1:k + 1]
+    for ponto_teste in pontos_teste:
+        distancias_ponto_a_todos_pontos_treinamento(pontos_treinamento, ponto_teste)
+        vizinhos_mais_proximos = ponto_teste.distancias_para_pontos_treinamento[:k]
         contagem_especies = defaultdict(int)
 
-        for _, ponto_treinamento in vizinhos_mais_proximos:
-            especie = ponto_treinamento.especie
-
-            contagem_especies[especie] += 1
+        for _, ponto in vizinhos_mais_proximos:
+            contagem_especies[ponto.especie] += 1
 
         especie_mais_frequente = max(contagem_especies, key=contagem_especies.get)
 
-        if especie_mais_frequente == ponto_treinamento.especie:
+        if especie_mais_frequente == ponto_teste.especie:
             acertos += 1
 
-    precisao_por_k[k] = acertos / len(pontos_treinamento)
+    precisao_por_k[k] = acertos / len(pontos_teste)
 
 
 melhor_k = max(precisao_por_k, key=precisao_por_k.get)

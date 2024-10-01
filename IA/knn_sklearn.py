@@ -58,10 +58,6 @@ desvio_padrao_treinamento = X_train[features].std()
 X_train[features] = (X_train[features] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de treino
 X_test[features] = (X_test[features] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de teste
 
-# Criar um DataFrame com os dados de treinamento
-df_train = pd.DataFrame(X_train, columns=["Id", "PetalWidthCm", "PetalLengthCm"])
-df_train.to_csv("X_train.csv", index=False)
-
 # Avaliar a acurácia para diferentes valores de k ímpares de 1 a 120
 k_values = range(1, 121, 2)
 accuracies = []
@@ -69,8 +65,8 @@ accuracies = []
 for k in k_values:
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_train, y_train)
-    y_pred = knn.predict(X_train)
-    accuracies.append(accuracy_score(y_train, y_pred))
+    y_pred = knn.predict(X_test)
+    accuracies.append(accuracy_score(y_test, y_pred))
 
 # Encontrar o melhor valor de k
 best_k = k_values[np.argmax(accuracies)]
