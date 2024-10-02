@@ -70,6 +70,9 @@ desvio_padrao_treinamento = treinamento[caracteristicas].std()
 treinamento[caracteristicas] = (treinamento[caracteristicas] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de treino
 teste[caracteristicas] = (teste[caracteristicas] - media_treinamento) / desvio_padrao_treinamento #normaliza os dados de teste
 
+for ponto in treinamento:
+    print(ponto)
+
 # gera os pontos de treinamento com base no dataframe e guarda as distancias relativas de todos os pontos de treinamento com cada um desses pontos
 pontos_treinamento = gerar_conjunto_pontos(
     treinamento["Id"].to_list(),
