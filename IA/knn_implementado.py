@@ -1,13 +1,12 @@
 from collections import defaultdict
 import pandas as pd
 import matplotlib.pyplot as plt
-import math
+import numpy as np
 from IPython.display import display
 
 class pontoIris:  # classe de cada ponto de análise (válido para treinamento e teste)
-
     def __init__(self, id, largura, comprimento, especie):
-        self.id = id
+        self.id: int = id
         self.largura = largura
         self.comprimento = comprimento
         self.especie = especie
@@ -35,15 +34,13 @@ def distancia_euclidiana(ponto1, ponto2):
     diferenca_comprimento = ponto1.comprimento - ponto2.comprimento
     diferenca_largura = ponto1.largura - ponto2.largura
 
-    return math.sqrt(diferenca_comprimento ** 2 + diferenca_largura ** 2)
+    return np.sqrt(diferenca_comprimento ** 2 + diferenca_largura ** 2)
 
 # calcula as distâncias de cada ponto de teste para todos os pontos de treinamento
 def distancias_ponto_a_todos_pontos_treinamento(pontos_treinamento, ponto_teste):
-
     distancias = []
 
     for ponto_treinamento in pontos_treinamento:
-
         distancia = distancia_euclidiana(ponto_teste, ponto_treinamento)
 
         distancias.append((distancia, ponto_treinamento))
@@ -59,14 +56,14 @@ iris = pd.read_csv("./Iris.csv")
 caracteristicas = ["PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]
 
 # Embaralha o database
-iris = iris.sample(frac=1, random_state=42)#.reset_index(drop=True)  # Embaralha e reseta os índices
+iris = iris.sample(frac=1, random_state=130)#.reset_index(drop=True)  # Embaralha e reseta os índices
 
 # Separa o database em conjunto de treinamento e teste
 tamanho_treinamento = round(len(iris) * 0.8)
 treinamento = iris[:tamanho_treinamento].copy()
 teste = iris[tamanho_treinamento:].copy()
 
-# Calcula a média e o desvio padrão com base apenas no conjunto de treinamento
+# # Calcula a média e o desvio padrão com base apenas no conjunto de treinamento
 media_treinamento = treinamento[caracteristicas].mean()
 desvio_padrao_treinamento = treinamento[caracteristicas].std()
 
@@ -94,7 +91,6 @@ precisao_por_k = {i: 0 for i in valores_k}
 
 for k in valores_k:
     acertos = 0
-
     for ponto_teste in pontos_teste:
         distancias_ponto_a_todos_pontos_treinamento(pontos_treinamento, ponto_teste)
         vizinhos_mais_proximos = ponto_teste.distancias_para_pontos_treinamento[:k]
@@ -107,12 +103,10 @@ for k in valores_k:
 
         if especie_mais_frequente == ponto_teste.especie:
             acertos += 1
-
-    precisao_por_k[k] = acertos / len(pontos_teste)
+    precisao_por_k[k] = acertos / len(pontos_teste) * 100
 
 
 melhor_k = max(precisao_por_k, key=precisao_por_k.get)
-
 print(f"Melhor valor de k: {melhor_k}")
 print(f"Melhor precisão: {precisao_por_k[melhor_k]}")
 

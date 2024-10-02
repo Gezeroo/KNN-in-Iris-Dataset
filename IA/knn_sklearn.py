@@ -8,49 +8,25 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import matplotlib.pyplot as plt
 
-
-# iris = pd.read_csv("./Iris.csv")
-
-# # Seleciona as colunas de características
-# caracteristicas = ["PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]
-
-# # Embaralha o database
-# iris = iris.sample(frac=1, random_state=42).reset_index(drop=True)  # Embaralha e reseta os índices
-
-# # Separa o database em conjunto de treinamento e teste
-# tamanho_treinamento = round(len(iris) * 0.8)
-# treinamento = iris[:tamanho_treinamento].copy()
-# teste = iris[tamanho_treinamento:].copy()
-
 # Carregar o conjunto de dados Iris
-# Lê o database
 iris = pd.read_csv("./Iris.csv")
 
 # Seleciona as colunas de características
-features = ["PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]
+features = ["PetalWidthCm", "PetalLengthCm"]
 
 # Embaralha o database
-iris = iris.sample(frac=1, random_state=42)#.reset_index(drop=True)  # Embaralha e reseta os índices
-X = iris.copy()  # Selecionar apenas petal length e petal width
-
+iris = iris.sample(frac=1, random_state=130)
 
 # Encode the string labels into numerical values
 y = iris.Species 
 label_encoder = LabelEncoder()
 y = label_encoder.fit_transform(y)
-
 tamanho_treinamento = round(len(iris) * 0.8)
-X_train = iris[:tamanho_treinamento][["Id", "PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]].copy()
+X_train = iris[:tamanho_treinamento][["Id", "PetalWidthCm", "PetalLengthCm"]].copy()
 y_train = y[:tamanho_treinamento].copy()
-X_test = iris[tamanho_treinamento:][["Id", "PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]].copy()
+X_test = iris[tamanho_treinamento:][["Id", "PetalWidthCm", "PetalLengthCm"]].copy()
 y_test = y[tamanho_treinamento:].copy()
 
-# Dividir o conjunto de dados em treinamento e teste
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-# Padronizar os dados
-# scaler = StandardScaler()
-# X_train = scaler.fit_transform(X_train)
-# X_test = scaler.transform(X_test)
 # Calcula a média e o desvio padrão com base apenas no conjunto de treinamento
 media_treinamento = X_train[features].mean()
 desvio_padrao_treinamento = X_train[features].std()
@@ -64,37 +40,31 @@ accuracies = []
 
 for k in k_values:
     knn = KNeighborsClassifier(n_neighbors=k)
-    knn.fit(X_train, y_train)
-    y_pred = knn.predict(X_test)
-    accuracies.append(accuracy_score(y_test, y_pred))
+    knn.fit(X_train[features], y_train)
+    y_pred = knn.predict(X_test[features])
+    accuracy = accuracy_score(y_test, y_pred)
+    accuracies.append((k, accuracy))
 
-# Encontrar o melhor valor de k
-best_k = k_values[np.argmax(accuracies)]
-print(f"Melhor valor de k: {best_k}")
+# Encontra o valor de k com a melhor acurácia
+best_k, best_accuracy = max(accuracies, key=lambda item: item[1])
 
-# Treinar o modelo com o melhor valor de k
+print(f"Melhor valor de k: {best_k} com acurácia de: {best_accuracy:.4f}")
+
+# Treina o modelo com o melhor valor de k
 best_knn = KNeighborsClassifier(n_neighbors=best_k)
-best_knn.fit(X_train, y_train)
-y_pred_best = best_knn.predict(X_test)
+best_knn.fit(X_train[features], y_train)
+y_pred_best = best_knn.predict(X_test[features])
 
-# Exibir o relatório de classificação
-print("Relatório de classificação para o melhor valor de k:")
-print(classification_report(y_test, y_pred_best))
+# Exibe o relatório de classificação
+print(classification_report(y_test, y_pred_best, target_names=label_encoder.classes_))
 
-# # Plotar o gráfico
-# plt.figure(figsize=(10, 5))
-# plt.plot(k_values, accuracies, marker='o')
-# plt.title('Acurácia para cada valor de k (ímpares)')
-# plt.xlabel('Número de vizinhos (k)')
-# plt.ylabel('Acurácia')
-# plt.xticks(range(0, 121, 10))
-# plt.grid(True)
-# plt.axvline(x=best_k, color='r', linestyle='--', label=f'Melhor k = {best_k} ({max(accuracies)*100:.2f}%)')
-# plt.legend()
-# plt.show()
+print(f"Melhor valor de k: {best_k}")
+print(f"Melhor acurácia: {best_accuracy:.4f}")
 
+# Plotar a acurácia para diferentes valores de k
+k_values, accuracies = zip(*accuracies)
 plt.plot(k_values, accuracies)
 plt.xlabel("Valor de k")
-plt.ylabel("Precisão")
-plt.title("Precisão do KNN para diferentes valores de k")
+plt.ylabel("Acurácia")
+plt.title("Acurácia do KNN para diferentes valores de k")
 plt.show()
