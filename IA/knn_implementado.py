@@ -56,7 +56,7 @@ iris = pd.read_csv("./Iris.csv")
 caracteristicas = ["PetalWidthCm", "PetalLengthCm", "SepalWidthCm", "SepalLengthCm"]
 
 # Embaralha o database
-iris = iris.sample(frac=1, random_state=130)#.reset_index(drop=True)  # Embaralha e reseta os índices
+iris = iris.sample(frac=1, random_state=42)#.reset_index(drop=True)  # Embaralha e reseta os índices
 
 # Separa o database em conjunto de treinamento e teste
 tamanho_treinamento = round(len(iris) * 0.8)
@@ -89,7 +89,8 @@ pontos_teste = gerar_conjunto_pontos(
     teste["Species"].to_list(),
 )
 
-valores_k = [i for i in range(1, len(pontos_treinamento)) if i % 2 != 0]  # valores de k a serem testados (impares)
+# valores_k = [i for i in range(1, len(pontos_treinamento)) if i % 2 != 0]  # valores de k a serem testados (impares)
+valores_k = range(3, 120, 2)
 precisao_por_k = {i: 0 for i in valores_k}
 
 for k in valores_k:
